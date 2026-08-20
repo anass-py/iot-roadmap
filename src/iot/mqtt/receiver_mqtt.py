@@ -1,0 +1,58 @@
+import paho.mqtt.client as mqtt
+from paho.mqtt.enums import CallbackAPIVersion
+import json
+import psycopg
+
+from iot.config import DATABASE_URL, MQTT_BROKER, MQTT_PORT, TOPIC_TELEMETRY
+
+conn = psycopg.connect(DATABASE_URL, autocommit=True)
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code == 0:
+        print("connecté")
+        client.subscribe(TOPIC_TELEMETRY, qos=1)   # tous les capteurs
+    else:
+        print(f"échec: {reason_code}")
+
+def on_message(client, userdata, msg):
+    try:
+        data = json.loads(msg.payload.decode())
+    except json.JSONDecodeError:
+        print("payload illisible:", msg.payload)
+        return
+
+    # sensor_id extrait du topic : voligle/telemetry/<device>/<sensor>
+    parties = msg.topic.split("/")
+    sensor_id = parties[-1]
+    device_id = parties[-2]
+    value = data.get("value")
+
+    if value is None:
+        print("pas de value, ignoré:", data)
+        return
+
+    with conn.cursor() as cur:
+        # créer l'appareil et le capteur à la volée si inconnus
+        cur.execute("INSERT INTO devices (id) VALUES (%s) ON CONFLICT DO NOTHING;",
+                    (device_id,))
+        cur.execute("""INSERT INTO sensors (id, device_id, type, unit)
+                       VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;""",
+                    (sensor_id, device_id, data.get("sensor_type", "unknown"),
+                     data.get("unit", "")))
+        # insérer la mesure
+        cur.execute("INSERT INTO readings (sensor_id, value, ts) VALUES (%s, %s, now());",
+                    (sensor_id, value))
+
+    print(f"stocké: {sensor_id} = {value}")
+
+client = mqtt.Client(CallbackAPIVersion.VERSION2, "db_receiver")
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect(MQTT_BROKER, MQTT_PORT)
+
+print("écoute... Ctrl+C pour arrêter.")
+try:
+    client.loop_forever()
+except KeyboardInterrupt:
+    conn.close()
+    client.disconnect()

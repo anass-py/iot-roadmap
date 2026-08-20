@@ -1,0 +1,24 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---------- Environnements virtuels ----------
+# Un seul venv pour ce projet : .venv à la racine.
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- Secrets : NE JAMAIS COMMITTER ----------
+.env
+*.env
+!.env.example
+
+# ---------- Documents personnels ----------
+docs/cv.pdf
+docs/*.docx
+
+# ---------- macOS ----------
+.DS_Store

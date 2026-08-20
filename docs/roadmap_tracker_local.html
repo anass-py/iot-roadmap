@@ -1,0 +1,303 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #E7E9E4;
+    --panel: #F2F3EF;
+    --ink: #141A19;
+    --muted: #6E7873;
+    --line: #C9CEC6;
+    --signal: #17527E;
+    --done: #3E7A66;
+    --flag: #A8641B;
+  }
+
+  * { box-sizing: border-box; }
+
+  .rt-root {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    padding: 28px 22px 60px;
+    max-width: 880px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .rt-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+
+  .rt-title {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 22px;
+  }
+
+  .rt-strip { display: flex; gap: 3px; height: 34px; align-items: flex-end; margin-bottom: 10px; }
+  .rt-tick { flex: 1; height: 11px; background: var(--line); border-radius: 1px; transition: height 260ms ease, background 260ms ease; }
+  .rt-tick.on { height: 34px; background: var(--done); }
+  .rt-tick.cur { height: 26px; background: var(--signal); }
+
+  .rt-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: 8px;
+    margin-bottom: 26px;
+  }
+  .rt-count b { color: var(--ink); font-weight: 600; }
+
+  .rt-next { background: var(--signal); color: #F2F3EF; border-radius: 3px; padding: 18px 20px; margin-bottom: 30px; }
+  .rt-next-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.72; margin-bottom: 7px;
+  }
+  .rt-next-title { font-size: 19px; font-weight: 500; margin-bottom: 10px; }
+  .rt-next-row { font-size: 13.5px; opacity: 0.9; margin-top: 5px; display: flex; gap: 8px; }
+  .rt-next-key {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.7; padding-top: 3px; flex-shrink: 0; width: 62px;
+  }
+
+  .rt-phase { margin-bottom: 30px; }
+  .rt-phase-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .rt-phase-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .rt-phase-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+  .rt-bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+  .rt-bar-fill { height: 100%; background: var(--done); width: 0; transition: width 300ms ease; }
+
+  .rt-item { display: flex; gap: 12px; padding: 10px 8px 10px 4px; border-bottom: 1px solid rgba(201,206,198,0.5); cursor: pointer; align-items: flex-start; }
+  .rt-item:hover { background: var(--panel); }
+  .rt-item:focus-visible { outline: 2px solid var(--signal); outline-offset: -2px; }
+
+  .rt-num { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); width: 20px; padding-top: 3px; flex-shrink: 0; }
+
+  .rt-box { width: 17px; height: 17px; border: 1.5px solid var(--muted); border-radius: 2px; flex-shrink: 0; margin-top: 2px; position: relative; }
+  .rt-item.checked .rt-box { background: var(--done); border-color: var(--done); }
+  .rt-item.checked .rt-box::after {
+    content: ""; position: absolute; left: 5px; top: 1px;
+    width: 4px; height: 9px; border: solid #F2F3EF; border-width: 0 2px 2px 0; transform: rotate(42deg);
+  }
+
+  .rt-body { flex: 1; min-width: 0; }
+  .rt-item-title { font-size: 14.5px; }
+  .rt-item.checked .rt-item-title { color: var(--muted); text-decoration: line-through; }
+  .rt-item-done { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .rt-flag {
+    display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+    color: var(--flag); border: 1px solid var(--flag); border-radius: 2px; padding: 0 4px; margin-left: 6px; vertical-align: 1px;
+  }
+
+  .rt-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+    border-top: 1px solid var(--line); padding-top: 14px;
+  }
+  .rt-reset {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; background: none;
+    border: 1px solid var(--line); color: var(--muted); padding: 5px 10px; border-radius: 2px; cursor: pointer;
+  }
+  .rt-reset:hover { border-color: var(--flag); color: var(--flag); }
+
+  @media (max-width: 520px) {
+    .rt-root { padding: 20px 14px 50px; }
+    .rt-title { font-size: 24px; }
+    .rt-phase-meta { font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rt-tick, .rt-bar-fill { transition: none; }
+  }
+</style>
+
+<div class="rt-root">
+  <p class="rt-eyebrow">Device to dashboard — 8 weeks, 4h/day</p>
+  <h1 class="rt-title">Fleet telemetry platform</h1>
+
+  <div class="rt-strip" id="strip"></div>
+  <div class="rt-count">
+    <span><b id="cDone">0</b> / <span id="cTotal">0</span> complete</span>
+    <span id="cStatus">Loading…</span>
+  </div>
+
+  <div class="rt-next" id="next">
+    <div class="rt-next-label">Next action</div>
+    <div class="rt-next-title" id="nextTitle">—</div>
+    <div class="rt-next-row"><span class="rt-next-key">Do</span><span id="nextDo"></span></div>
+    <div class="rt-next-row"><span class="rt-next-key">Start by</span><span id="nextStart"></span></div>
+    <div class="rt-next-row"><span class="rt-next-key">Done when</span><span id="nextDone"></span></div>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="rt-foot">
+    <span>Progress saves automatically</span>
+    <button class="rt-reset" id="reset">Reset all</button>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  { name: "Refresh", meta: "Week 0 · ~8h", items: [
+    ["MQTT recall", "Explain QoS 0/1/2, LWT, retained, wildcards with no notes", "Say all four out loud now; note which one wobbled"],
+    ["Protocol landscape", "One sentence each: LoRaWAN, NB-IoT, BLE, Zigbee, Wi-Fi", "Write one line per protocol from memory, then check it"],
+    ["Old simulator runs again", "Sender and receiver both publishing and receiving", "Open the old repo, fix whatever broke"],
+    ["Docker basics", "run, ps, logs, exec, stop, volumes — explained in your words", "docker run hello-world, then docker ps -a"],
+    ["FastAPI recall", "Old API runs, /docs opens, you can add an endpoint", "uvicorn main:app --reload"]
+  ]},
+  { name: "Storage", meta: "Weeks 1–2 · ~50h", items: [
+    ["Postgres running in Docker", "Insert one row from Python, read it back", "docker run the postgres image, pip install psycopg"],
+    ["Schema design", "devices + readings tables, foreign key, index on (device_id, ts)", "Draw the two tables on paper before writing SQL"],
+    ["SQL joins", "A query joining devices to readings; inner vs left explained aloud", "Insert three devices and ten readings to have something to join"],
+    ["Aggregations + time buckets", "Hourly average per device in one query", "Start with GROUP BY device_id, then add the time bucket"],
+    ["Window functions", "LAG computing the delta between consecutive readings", "Read what LAG does, then run it on ten rows", 1],
+    ["TimescaleDB hypertables", "readings is a hypertable, chunks visible", "Swap the postgres image for timescale/timescaledb"],
+    ["Continuous aggregates", "Hourly rollup refreshing on its own", "Create one on the query you wrote in item 09"],
+    ["Retention policy", "Raw data dropped after N days — and you can justify N", "Pick N first, out loud, with a reason"],
+    ["Ingestion writes to Timescale", "An MQTT message lands in the DB; the dict is deleted", "Take your old receiver and replace the dict write"],
+    ["Batch vs row-by-row inserts", "You timed both and know the number", "Insert 10k rows each way, time it"]
+  ]},
+  { name: "API + data serving", meta: "Week 3 · ~25h", items: [
+    ["Pydantic + POST endpoint", "422 on bad data, 201 on good", "One BaseModel, three fields, then send it garbage"],
+    ["Time-range query params", "?from=&to= filters real rows", "Add two optional datetime params to GET /readings"],
+    ["Pagination", "limit/offset works, default cap enforced", "Set a max limit before you write anything else"],
+    ["Aggregated endpoint", "Returns hourly averages, not raw rows", "Point it at the continuous aggregate from item 12"],
+    ["Error handling", "404, 422 and 500 each reachable on purpose", "Request a device that doesn't exist"],
+    ["API key auth", "A request without the header is rejected", "One header check as a FastAPI dependency"]
+  ]},
+  { name: "Visualisation + alerting", meta: "Week 4 · ~25h", items: [
+    ["Grafana connected", "Three panels reading from Timescale", "Add Grafana to compose, add the Postgres data source"],
+    ["Dashboard design", "An operator spots a problem in five seconds", "Decide the three things an operator must see"],
+    ["Silent-device detection", "A device stops publishing and the system notices", "Define the rule in one sentence before coding it", 1],
+    ["LWT to device state table", "The status topic drives an online/offline column", "You already publish LWT — consume it now"],
+    ["Alert delivery", "A real message arrives when a device goes silent", "Telegram bot is the fastest to get working"],
+    ["Late data + clock drift", "Both timestamps stored; you can explain the difference", "Add received_at next to measured_at"]
+  ]},
+  { name: "Ops + deployment", meta: "Weeks 5–6 · ~50h", items: [
+    ["Docker Compose stack", "One command brings up every service", "Write the compose file with broker + db first"],
+    ["Multi-stage builds", "Image size before and after — you know the number", "docker images, note the size, then rebuild"],
+    ["Own Mosquitto with TLS", "Public broker removed, auth required", "Run Mosquitto in compose with a password file"],
+    ["Cross-arch knowledge", "Explain buildx, ARM, balena delta updates aloud", "Ninety seconds out loud — you have done this at work"],
+    ["AWS deploy", "Stack reachable from the internet, billing alert set", "Set the billing alert before anything else", 1],
+    ["AWS IoT Core", "One device connected to the managed broker", "Create one thing, download the certs, publish once"],
+    ["Config + secrets", "Nothing hardcoded, .env gitignored", "Grep your repo for the password you typed in item 06"],
+    ["GitHub Actions CI", "Tests run on every push", "One workflow file that runs pytest"],
+    ["Logging + health endpoint", "/health reports dependency status", "Make it check the DB connection, not just return ok"]
+  ]},
+  { name: "Depth + interview readiness", meta: "Weeks 7–8 · ~50h", items: [
+    ["pytest", "Ingestion logic tested with a mocked broker", "Test the parse function first — no broker needed"],
+    ["asyncio", "Explain the event loop and where it helps here", "Find the one place in your stack that blocks"],
+    ["Kafka vs MQTT vs RabbitMQ", "A 60-second verbal comparison", "One sentence on what each was built for"],
+    ["Backpressure", "Name what breaks first when devices outpace ingestion", "Run 200 simulated devices and watch"],
+    ["Scaling story", "100 to 10k to 100k, three named bottlenecks", "Name the bottlenecks before you research them"],
+    ["Threat model", "Device in a basement — what you assume is compromised", "Assume the device is stolen, then work backwards"],
+    ["Payload cost", "JSON vs binary, why not every second", "Measure your payload size in bytes"],
+    ["Whiteboard the architecture in 3 min, twice", "Twice, out loud, no notes", "Draw it once badly, then again"],
+    ["Backtester as an engineering story", "Pipeline, validation, autonomy — 90 seconds", "Cut every word about markets from the story"]
+  ]}
+];
+
+const KEY = 'iot-roadmap-v1';
+let done = {};
+
+const flat = [];
+PHASES.forEach((p, pi) => p.items.forEach(it => flat.push({
+  id: flat.length + 1, phase: pi, title: it[0], dod: it[1], start: it[2], slow: it[3] === 1
+})));
+
+function render() {
+  const nextItem = flat.find(i => !done[i.id]);
+
+  document.getElementById('strip').innerHTML = flat.map(i =>
+    '<div class="rt-tick ' + (done[i.id] ? 'on' : (nextItem && i.id === nextItem.id ? 'cur' : '')) + '"></div>'
+  ).join('');
+
+  document.getElementById('cDone').textContent = Object.keys(done).length;
+  document.getElementById('cTotal').textContent = flat.length;
+
+  const nx = document.getElementById('next');
+  if (nextItem) {
+    nx.style.display = '';
+    document.getElementById('nextTitle').textContent = String(nextItem.id).padStart(2,'0') + '. ' + nextItem.title;
+    document.getElementById('nextDo').textContent = nextItem.title + (nextItem.slow ? ' — this one is slow, expect several sessions' : '');
+    document.getElementById('nextStart').textContent = nextItem.start;
+    document.getElementById('nextDone').textContent = nextItem.dod;
+  } else {
+    nx.style.display = 'none';
+  }
+
+  document.getElementById('phases').innerHTML = PHASES.map((p, pi) => {
+    const items = flat.filter(i => i.phase === pi);
+    const c = items.filter(i => done[i.id]).length;
+    const pct = Math.round((c / items.length) * 100);
+    return '<div class="rt-phase">' +
+      '<div class="rt-phase-head"><span class="rt-phase-name">' + p.name + '</span>' +
+      '<span class="rt-phase-meta">' + c + '/' + items.length + ' · ' + pct + '% · ' + p.meta + '</span></div>' +
+      '<div class="rt-bar"><div class="rt-bar-fill" style="width:' + pct + '%"></div></div>' +
+      items.map(i =>
+        '<div class="rt-item ' + (done[i.id] ? 'checked' : '') + '" data-id="' + i.id + '" tabindex="0" role="checkbox" aria-checked="' + !!done[i.id] + '">' +
+        '<span class="rt-num">' + String(i.id).padStart(2, '0') + '</span>' +
+        '<span class="rt-box"></span>' +
+        '<span class="rt-body"><span class="rt-item-title">' + i.title +
+        (i.slow ? '<span class="rt-flag">SLOW</span>' : '') + '</span>' +
+        '<div class="rt-item-done">' + i.dod + '</div></span></div>'
+      ).join('') + '</div>';
+  }).join('');
+}
+
+function save() {
+  const s = document.getElementById('cStatus');
+  try {
+    localStorage.setItem(KEY, JSON.stringify(done));
+    s.textContent = 'Saved locally';
+  } catch (e) {
+    s.textContent = 'Not saved — storage blocked';
+  }
+}
+
+function load() {
+  const s = document.getElementById('cStatus');
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) done = JSON.parse(raw);
+    s.textContent = 'Saved locally';
+  } catch (e) {
+    done = {};
+    s.textContent = 'Starting fresh';
+  }
+  render();
+}
+
+document.getElementById('phases').addEventListener('click', e => {
+  const row = e.target.closest('.rt-item');
+  if (!row) return;
+  const id = row.dataset.id;
+  if (done[id]) delete done[id]; else done[id] = new Date().toISOString();
+  render(); save();
+});
+
+document.getElementById('phases').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const row = e.target.closest('.rt-item');
+  if (!row) return;
+  e.preventDefault();
+  row.click();
+});
+
+document.getElementById('reset').addEventListener('click', () => { done = {}; render(); save(); });
+
+render();
+load();
+</script>
