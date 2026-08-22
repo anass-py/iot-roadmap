@@ -41,7 +41,7 @@ services:
 
   surveillance:
     build: .
-    command: python src/iot/alertes/suveillance.py
+    command: python src/iot/alertes/surveillance.py
     env_file: .env
     depends_on: [timescaledb]
     restart: unless-stopped

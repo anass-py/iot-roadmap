@@ -3,7 +3,7 @@ load_dotenv()
 
 import time
 import psycopg
-from alertes import envoyer_alerte
+from iot.alertes.alertes import envoyer_alerte
 
 CONN = "postgresql://postgres:devpass@localhost:5432/postgres"
 
