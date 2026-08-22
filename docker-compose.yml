@@ -1,58 +1,10 @@
-# # Reproduit la stack que tu as déjà lancée à la main (iot-db, mosquitto, grafana).
-# # Le volume pgdata est déclaré "external" : c'est le tien, tes données sont gardées.
-# services:
-#   db:
-#     image: timescale/timescaledb:latest-pg16
-#     container_name: iot-db
-#     environment:
-#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
-#     ports:
-#       - "5432:5432"
-#     volumes:
-#       - pgdata:/var/lib/postgresql/data
-#     restart: unless-stopped
-
-#   mosquitto:
-#     image: eclipse-mosquitto:2
-#     container_name: mosquitto
-#     # même conf que ton conteneur actuel : anonyme, fournie par l'image
-#     command: mosquitto -c /mosquitto-no-auth.conf
-#     ports:
-#       - "1883:1883"
-#     volumes:
-#       - mosquitto_data:/mosquitto/data
-#       - mosquitto_log:/mosquitto/log
-#     restart: unless-stopped
-
-#   grafana:
-#     image: grafana/grafana
-#     container_name: grafana
-#     ports:
-#       - "3000:3000"
-#     # ton conteneur actuel n'a PAS de volume : les dashboards vivent dans le
-#     # conteneur et disparaissent s'il est supprimé. Ce volume corrige ça.
-#     volumes:
-#       - grafana_data:/var/lib/grafana
-#     depends_on:
-#       - db
-#     restart: unless-stopped
-
-# volumes:
-#   pgdata:
-#     external: true
-#   mosquitto_data:
-#   mosquitto_log:
-#   grafana_data:
-
-#------------ docker compose myself -----------
-
 services:
   mosquitto:
     image: eclipse-mosquitto:2
     ports:
       - "1883:1883"
     volumes:
-      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/config:/mosquitto/config      # ← volume config
     command: mosquitto -c /mosquitto/config/mosquitto.conf
 
   timescaledb:
@@ -62,7 +14,30 @@ services:
     environment:
       POSTGRES_PASSWORD: devpass
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data           # ← volume données
+
+  receiver:
+    build: .
+    command: python src/iot/mqtt/receiver_mqtt.py
+    env_file: .env
+    depends_on: [mosquitto, timescaledb]
+    restart: unless-stopped
+
+  api:
+    build: .
+    command: uvicorn iot.api.main:app --host 0.0.0.0 --port 8000
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on: [timescaledb]
+    restart: unless-stopped
+
+  surveillance:
+    build: .
+    command: python src/iot/alertes/suveillance.py
+    env_file: .env
+    depends_on: [timescaledb]
+    restart: unless-stopped
 
 volumes:
   pgdata:
