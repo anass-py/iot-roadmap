@@ -11,6 +11,6 @@ COPY src/ ./src/
 
 # 3. pour que Python trouve le paquet iot
 ENV PYTHONPATH=/app/src
-
+ENV PYTHONUNBUFFERED=1
 # 4. commande de démarrage
 CMD ["python", "src/iot/mqtt/receiver_mqtt.py"]
