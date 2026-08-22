@@ -1,16 +1,16 @@
 from dotenv import load_dotenv
-load_dotenv()
-
+from iot.config import DATABASE_URL
 import time
 import psycopg
 from iot.alertes.alertes import envoyer_alerte
 
-CONN = "postgresql://postgres:devpass@localhost:5432/postgres"
+load_dotenv()
+
 
 deja_signales = set()   # capteurs déjà en alerte
 
 def verifier_silence():
-    with psycopg.connect(CONN) as conn:
+    with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT s.id
