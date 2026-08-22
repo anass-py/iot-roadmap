@@ -98,3 +98,4 @@ curl -H "X-API-Key: $API_KEY" "http://localhost:8000/readings?sensor_id=temp_01&
 - **Un seul venv** : `.venv/` à la racine. Ne pas en créer dans les sous-dossiers.
 - **Aucun secret en dur** : tout passe par `.env` → `src/iot/config.py`.
 - **`schema.py` fait des `DROP`** : il efface les données avant de recréer.
+# iot-roadmap
