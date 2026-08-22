@@ -16,6 +16,13 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data           # ← volume données
 
+  sender:
+    build: .
+    command: python src/iot/mqtt/sender_mqtt.py
+    env_file: .env
+    depends_on: [mosquitto]
+    restart: unless-stopped
+
   receiver:
     build: .
     command: python src/iot/mqtt/receiver_mqtt.py
