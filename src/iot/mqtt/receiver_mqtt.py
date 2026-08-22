@@ -2,8 +2,10 @@ import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 import json
 import psycopg
-
 from iot.config import DATABASE_URL, MQTT_BROKER, MQTT_PORT, TOPIC_TELEMETRY
+from paho.mqtt.properties import Properties
+from paho.mqtt.packettypes import PacketTypes
+from iot.config import MQTT_USER, MQTT_PASSWORD
 
 conn = psycopg.connect(DATABASE_URL, autocommit=True)
 
@@ -26,6 +28,7 @@ def on_message(client, userdata, msg):
     sensor_id = parties[-1]
     device_id = parties[-2]
     value = data.get("value")
+    measured_at = data.get("ts")
 
     if value is None:
         print("pas de value, ignoré:", data)
@@ -40,15 +43,19 @@ def on_message(client, userdata, msg):
                     (sensor_id, device_id, data.get("sensor_type", "unknown"),
                      data.get("unit", "")))
         # insérer la mesure
-        cur.execute("INSERT INTO readings (sensor_id, value, ts) VALUES (%s, %s, now());",
-                    (sensor_id, value))
+        cur.execute("INSERT INTO readings (sensor_id, value, ts, received_at) VALUES (%s, %s, %s, now());",
+                    (sensor_id, value, measured_at))
 
     print(f"stocké: {sensor_id} = {value}")
 
-client = mqtt.Client(CallbackAPIVersion.VERSION2, "db_receiver")
+client = mqtt.Client(CallbackAPIVersion.VERSION2, "db_receiver",protocol=mqtt.MQTTv5)
+props = Properties(PacketTypes.CONNECT)
+props.SessionExpiryInterval = 3600   # garde la session 1 heure
 client.on_connect = on_connect
 client.on_message = on_message
-client.connect(MQTT_BROKER, MQTT_PORT)
+client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+print("auth:", MQTT_USER, MQTT_PASSWORD)
+client.connect(MQTT_BROKER, MQTT_PORT,clean_start=False, properties=props)
 
 print("écoute... Ctrl+C pour arrêter.")
 try:

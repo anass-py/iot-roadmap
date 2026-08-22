@@ -2,8 +2,8 @@ import random, time, json
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
-
 from iot.config import MQTT_BROKER, MQTT_PORT
+from iot.config import MQTT_USER, MQTT_PASSWORD
 
 DEVICE_ID = "sim-001"
 SENSOR_TYPE = "temperature"
@@ -14,6 +14,8 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 client = mqtt.Client(CallbackAPIVersion.VERSION2, DEVICE_ID)
 client.on_connect = on_connect
+client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+print("auth:", MQTT_USER, MQTT_PASSWORD)
 client.connect(MQTT_BROKER, MQTT_PORT)
 client.loop_start()
 

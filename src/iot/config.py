@@ -37,3 +37,7 @@ API_KEY = os.getenv("API_KEY", "ma-cle-secrete")
 # ---------- Alertes Telegram ----------
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+#---------- AUTH MQTT ---------------
+MQTT_USER = os.getenv("MQTT_USER")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD")

@@ -45,3 +45,27 @@ FROM timescaledb_information.jobs;
 --------------------------------
 don't forget the 401, 404 ...
 --------- graphana --------------
+capteur silencieux = dernière mesure trop vieille. now() - MAX(ts) > seuil. Seuil = quelques fois la période d'émission.
+
+--------alertes---------
+connect to db, detect the ones that haven't send over a period of time, send the alerts to telegram bot.
+
+------file d'attete MQTT ----
+latency between sending and receiving:
+clean_start=False coté receiver, dit au broker, send me all data when i was off, since now i m on motherfucker.
+-----------------
+autocommit= true : we commit each line by line, because the imescaledb execustion wants to be commited at the moment of creation.
+-------------------
+compose vs run : 
+-so between db and mosquito, they can talk to each other bcs they are on the same compose.
+-if i add a separate container for receive, i need to manually add network to talk to the compose (db and mosquito)
+-if i create a container for receive inside compose, they can talk with names.
+all in all, if something run on my machine, it can talk to any container (run, or compose) simply with localhost via ports, if isolated containers, we need network manually, that's why if many containers we need compose.
+-----------------------------
+ builder vs slim :
+ if we have some gcc heavy compilation, we :
+ 1- create a builder image from requirement.txt.
+ 2- create a slim image that copy only results from the builder.
+ once the dependencie change during your project, update only requirements.txt, and re-build the slim image. on the background docker knew what he should do.
+ -----------------------------
+ 

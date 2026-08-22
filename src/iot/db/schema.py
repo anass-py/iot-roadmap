@@ -1,7 +1,7 @@
 import psycopg
 from iot.config import DATABASE_URL
 
-with psycopg.connect(DATABASE_URL) as conn:
+with psycopg.connect(DATABASE_URL, autocommit=True) as conn:
     with conn.cursor() as cur:
         cur.execute("CREATE EXTENSION IF NOT EXISTS timescaledb;")
 
@@ -24,7 +24,11 @@ with psycopg.connect(DATABASE_URL) as conn:
             sensor_id TEXT NOT NULL REFERENCES sensors(id),
             value DOUBLE PRECISION NOT NULL,
             ts TIMESTAMPTZ NOT NULL,
+            received_at TIMESTAMPTZ NOT NULL DEFAULT now(),
             PRIMARY KEY (id, ts));""")
+
+        cur.execute("""CREATE INDEX idx_readings_sensor_ts
+            ON readings (sensor_id, ts DESC);""")
 
         cur.execute("SELECT create_hypertable('readings', 'ts');")
 
@@ -33,4 +37,7 @@ with psycopg.connect(DATABASE_URL) as conn:
             SELECT sensor_id, time_bucket('1 hour', ts) AS heure, AVG(value) AS moyenne
             FROM readings GROUP BY sensor_id, heure;""")
 
+        cur.execute("SELECT add_retention_policy('readings', INTERVAL '30 days');")
+
+        
         print("schéma complet créé")

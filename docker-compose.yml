@@ -1,45 +1,68 @@
-# Reproduit la stack que tu as déjà lancée à la main (iot-db, mosquitto, grafana).
-# Le volume pgdata est déclaré "external" : c'est le tien, tes données sont gardées.
-services:
-  db:
-    image: timescale/timescaledb:latest-pg16
-    container_name: iot-db
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+# # Reproduit la stack que tu as déjà lancée à la main (iot-db, mosquitto, grafana).
+# # Le volume pgdata est déclaré "external" : c'est le tien, tes données sont gardées.
+# services:
+#   db:
+#     image: timescale/timescaledb:latest-pg16
+#     container_name: iot-db
+#     environment:
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data
+#     restart: unless-stopped
 
+#   mosquitto:
+#     image: eclipse-mosquitto:2
+#     container_name: mosquitto
+#     # même conf que ton conteneur actuel : anonyme, fournie par l'image
+#     command: mosquitto -c /mosquitto-no-auth.conf
+#     ports:
+#       - "1883:1883"
+#     volumes:
+#       - mosquitto_data:/mosquitto/data
+#       - mosquitto_log:/mosquitto/log
+#     restart: unless-stopped
+
+#   grafana:
+#     image: grafana/grafana
+#     container_name: grafana
+#     ports:
+#       - "3000:3000"
+#     # ton conteneur actuel n'a PAS de volume : les dashboards vivent dans le
+#     # conteneur et disparaissent s'il est supprimé. Ce volume corrige ça.
+#     volumes:
+#       - grafana_data:/var/lib/grafana
+#     depends_on:
+#       - db
+#     restart: unless-stopped
+
+# volumes:
+#   pgdata:
+#     external: true
+#   mosquitto_data:
+#   mosquitto_log:
+#   grafana_data:
+
+#------------ docker compose myself -----------
+
+services:
   mosquitto:
     image: eclipse-mosquitto:2
-    container_name: mosquitto
-    # même conf que ton conteneur actuel : anonyme, fournie par l'image
-    command: mosquitto -c /mosquitto-no-auth.conf
     ports:
       - "1883:1883"
     volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_log:/mosquitto/log
-    restart: unless-stopped
+      - ./mosquitto/config:/mosquitto/config
+    command: mosquitto -c /mosquitto/config/mosquitto.conf
 
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
     ports:
-      - "3000:3000"
-    # ton conteneur actuel n'a PAS de volume : les dashboards vivent dans le
-    # conteneur et disparaissent s'il est supprimé. Ce volume corrige ça.
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: devpass
     volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - db
-    restart: unless-stopped
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
-    external: true
-  mosquitto_data:
-  mosquitto_log:
-  grafana_data:

@@ -1,0 +1,7 @@
+.venv              # environnement virtuel, énorme, recréé par pip dans l'image
+__pycache__        # caches Python compilés, inutiles
+*.pyc              # fichiers Python compilés
+.git               # tout l'historique git, lourd et inutile dans l'image
+.env               # SECRETS — jamais dans une image
+*.md               # documentation (NOTES.md, README...), pas nécessaire à l'exécution
+.pytest_cache      # cache de tests
