@@ -29,10 +29,16 @@ def verifier_cle(x_api_key: str = Header(None)):
 
 @app.get("/health")
 def health():
-    with conn.cursor() as cur:
-        cur.execute("SELECT 1;")
-        cur.fetchone()
-    return {"status": "ok"}
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1;")
+            cur.fetchone()
+        db_ok = True
+    except Exception:
+        db_ok = False
+
+    status = "ok" if db_ok else "degraded"
+    return {"status": status, "database": "up" if db_ok else "down"}
 
 
 @app.get("/sensors/latest")
