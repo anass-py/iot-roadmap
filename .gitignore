@@ -22,3 +22,6 @@ docs/*.docx
 
 # ---------- macOS ----------
 .DS_Store
+
+#----------mosquitto auth -------
+mosquitto/config/passwd
