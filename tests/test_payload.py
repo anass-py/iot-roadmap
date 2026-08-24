@@ -1,4 +1,4 @@
-from iot.mqtt.receiver_mqtt import payload_valide
+from iot.core.validation import payload_valide
 
 
 def test_valeur_numerique_valide():

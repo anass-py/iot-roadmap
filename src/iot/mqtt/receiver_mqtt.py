@@ -6,6 +6,7 @@ from iot.config import DATABASE_URL, MQTT_BROKER, MQTT_PORT, TOPIC_TELEMETRY
 from paho.mqtt.properties import Properties
 from paho.mqtt.packettypes import PacketTypes
 from iot.config import MQTT_USER, MQTT_PASSWORD
+from iot.core.validation import payload_valide
 
 conn = psycopg.connect(DATABASE_URL, autocommit=True)
 
@@ -16,9 +17,6 @@ def on_connect(client, userdata, flags, reason_code, properties):
     else:
         print(f"échec: {reason_code}")
 
-def payload_valide(data):
-    value = data.get("value")
-    return isinstance(value, (int, float))
 
 def on_message(client, userdata, msg):
     try:
@@ -51,7 +49,7 @@ def on_message(client, userdata, msg):
                     (sensor_id, value, measured_at))
 
     print(f"stocké: {sensor_id} = {value}")
-    
+
 if __name__ == "__main__":
     props = Properties(PacketTypes.CONNECT)
     props.SessionExpiryInterval = 3600  # garde la session 1 heure
