@@ -16,6 +16,10 @@ def on_connect(client, userdata, flags, reason_code, properties):
     else:
         print(f"échec: {reason_code}")
 
+def payload_valide(data):
+    value = data.get("value")
+    return isinstance(value, (int, float))
+
 def on_message(client, userdata, msg):
     try:
         data = json.loads(msg.payload.decode())
@@ -30,7 +34,7 @@ def on_message(client, userdata, msg):
     value = data.get("value")
     measured_at = data.get("ts")
 
-    if value is None:
+    if not payload_valide(data):
         print("pas de value, ignoré:", data)
         return
 
@@ -47,19 +51,20 @@ def on_message(client, userdata, msg):
                     (sensor_id, value, measured_at))
 
     print(f"stocké: {sensor_id} = {value}")
+    
+if __name__ == "__main__":
+    props = Properties(PacketTypes.CONNECT)
+    props.SessionExpiryInterval = 3600  # garde la session 1 heure
 
-client = mqtt.Client(CallbackAPIVersion.VERSION2, "db_receiver",protocol=mqtt.MQTTv5)
-props = Properties(PacketTypes.CONNECT)
-props.SessionExpiryInterval = 3600   # garde la session 1 heure
-client.on_connect = on_connect
-client.on_message = on_message
-client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
-print("auth:", MQTT_USER, MQTT_PASSWORD)
-client.connect(MQTT_BROKER, MQTT_PORT,clean_start=False, properties=props)
+    client = mqtt.Client(CallbackAPIVersion.VERSION2, "db_receiver", protocol=mqtt.MQTTv5)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+    client.connect(MQTT_BROKER, MQTT_PORT, clean_start=False, properties=props)
 
-print("écoute... Ctrl+C pour arrêter.")
-try:
-    client.loop_forever()
-except KeyboardInterrupt:
-    conn.close()
-    client.disconnect()
+    print("écoute... Ctrl+C pour arrêter.")
+    try:
+        client.loop_forever()
+    except KeyboardInterrupt:
+        conn.close()
+        client.disconnect()

@@ -68,4 +68,6 @@ all in all, if something run on my machine, it can talk to any container (run, o
  2- create a slim image that copy only results from the builder.
  once the dependencie change during your project, update only requirements.txt, and re-build the slim image. on the background docker knew what he should do.
  -----------------------------
+ iot/config : for better reading of the .env, if you add a rule for a specific variable, you add it once on your config, not all over your code.
+ ---------------------------
  

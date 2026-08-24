@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Télémétrie IoT — carnets de révision</title>
+<meta name="description" content="Notes, pannes et frictions du projet de télémétrie IoT, rassemblées en une lecture animée.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="progress"><i id="prog"></i></div>
+
+<header class="top">
+  <button class="brand" data-go="home" title="Accueil">
+    <i class="bdot"></i>
+    <b>Télémétrie IoT</b>
+    <span>carnets</span>
+  </button>
+
+  <nav class="tabs" id="tabs" role="tablist"><i class="tab-ink" id="tabink"></i></nav>
+
+  <div class="acts">
+    <button class="btn" id="btn-search" title="Rechercher (⌘K)">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <span class="lbl">Rechercher</span><kbd>⌘K</kbd>
+    </button>
+    <button class="btn" id="btn-quiz" title="Mode révision : masque les réponses (R)">
+      <svg viewBox="0 0 24 24"><path d="M12 17.5v.01"/><path d="M9 9a3 3 0 1 1 4.2 2.8c-.8.4-1.2 1-1.2 1.9v.8"/><circle cx="12" cy="12" r="9.5"/></svg>
+      <span class="lbl">Révision</span>
+    </button>
+    <button class="btn btn-icon" id="btn-theme" title="Thème clair / sombre (T)">
+      <svg viewBox="0 0 24 24" id="ico-theme"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<div class="overlay" id="overlay">
+  <div class="finder" role="dialog" aria-label="Recherche">
+    <div class="finder-in">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="q" type="text" placeholder="Chercher une notion, une panne, une friction…" autocomplete="off" spellcheck="false">
+      <span class="esc">esc</span>
+    </div>
+    <div class="results" id="results"></div>
+    <div class="finder-foot">
+      <span>↑↓ naviguer</span><span>⏎ ouvrir</span><span>esc fermer</span>
+    </div>
+  </div>
+</div>
+
+<script src="assets/content.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

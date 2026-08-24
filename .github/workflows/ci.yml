@@ -17,3 +17,6 @@ jobs:
 
       - name: Vérifier la syntaxe
         run: python -m compileall src/
+      
+      - name: Lancer les tests
+        run: PYTHONPATH=src python -m pytest
